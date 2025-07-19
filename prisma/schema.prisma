@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password      String
+  avatar        String?
+  isVerified    Boolean  @default(false)
+  isHost        Boolean  @default(false)
+  university    String?
+  graduationYear Int?
+  bio           String?
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  listings      Listing[]
+  sentMessages  Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  verifications VerificationData[]
+  compatibility RoommateCompatibility?
+  spotFinder    SpotFinder?
+  sixerSubscription SixerSubscription?
+  notifications Notification[]
+  boostListings BoostListing[]
+
+  @@map("users")
+}
+
+model Listing {
+  id              String   @id @default(cuid())
+  hostId          String
+  title           String
+  description     String
+  rent            Float
+  utilities       Float
+  moveInDate      DateTime
+  leaseLength     Int // in months
+  isFurnished     Boolean @default(false)
+  allowsPets      Boolean @default(false)
+  vibeTags        String[] // JSON array
+  languages       String[] // JSON array
+  latitude        Float
+  longitude       Float
+  address         String
+  distanceToCampus Float
+  images          String[] // JSON array
+  isActive        Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  host            User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  boostListings   BoostListing[]
+
+  @@map("listings")
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  content     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model VerificationData {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // 'email', 'id', 'liveness'
+  status    String   @default("pending") // 'pending', 'approved', 'rejected'
+  data      Json?    // Additional verification data
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verification_data")
+}
+
+model RoommateCompatibility {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  cleanliness  Int      // 1-5 scale
+  noiseLevel   Int      // 1-5 scale
+  socialLevel  Int      // 1-5 scale
+  studyHabits  Int      // 1-5 scale
+  sleepSchedule Int     // 1-5 scale
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("roommate_compatibility")
+}
+
+model BoostListing {
+  id          String   @id @default(cuid())
+  listingId   String
+  type        String   // 'spotlight', 'premium', 'urgent'
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+
+  // Relations
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("boost_listings")
+}
+
+model SpotFinder {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  viewCount    Int      @default(0)
+  messageCount Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("spot_finders")
+}
+
+model SixerSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  plan      String   // 'basic', 'premium', 'concierge'
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sixer_subscriptions")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // 'message', 'booking_request', 'verification_approved', etc.
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  data      Json?    // Additional notification data
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model CampusAnalytics {
+  id            String   @id @default(cuid())
+  university    String
+  totalListings Int      @default(0)
+  totalUsers    Int      @default(0)
+  averageRent   Float    @default(0)
+  popularAreas  String[] // JSON array
+  createdAt     DateTime @default(now())
+
+  @@map("campus_analytics")
+} 

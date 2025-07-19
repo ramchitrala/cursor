@@ -1,0 +1,45 @@
+🏗️  Act as the senior engineer on RoomSpot.
+
+Tech stack locked:
+• Next.js 14 + TypeScript
+• shadcn/ui (Tailwind) components
+• Prisma + Postgres
+• Stripe for paid flows
+• Framer‑motion for micro‑animations
+• Jest + Testing‑Library + Playwright for unit / responsiveness tests
+
+====================  FUNCTIONAL RULES  ====================
+
+1. 🔍  **Search‑first home**
+   • At `/` render a hero search bar with placeholder “Search by university name”.
+   • Users may browse results without auth.  
+   • **Any action beyond explore** (apply filter, save listing, message, checkout) → redirect to `/login?next=…`.
+
+2. 📱 🖥️  **True responsiveness**
+   • Mobile: 375 px width baseline; Desktop: max‑width `1280px` centered container.
+   • Add Playwright viewport tests at 360 × 800, 768 × 1024, 1440 × 900.
+   • All tests must pass before PR completion.
+
+3. 🌀  **AR Preview**
+   • Each listing card shows a 16 × 16 AR‑360 icon overlay at top‑right if `listing.hasAr`.
+   • Clicking opens `/listing/[id]/ar` – embed `@google/model-viewer` in 360‑mode; fallback to 2D gallery.
+
+4. 💸  **Sixer**
+   • Promo banner “Need a decision fast? Try Sixer – $6.99 once.”  
+   • Checkout via Stripe one‑off; on success call `POST /api/sixer/start` to trigger host↔looker matchmaking workflow.  
+   • Add badge “Sixer in progress” on the conversation list until closed.  
+
+5. ⚪ ⚫  **Strict monochrome theme**
+   • Allowed colors: `#ffffff`, `#000000`, grayscale tokens (`gray-50`‑`gray-900`) only.
+   • CI test: fail build if any hex outside these ranges appears in Tailwind config or CSS.
+
+6. ✨  **Fluid micro‑animations**
+   • Animate only icons / SVG elements (NOT text).  
+   • Use framer‑motion `whileHover` and `whileTap` with spring `{ stiffness: 400, damping: 28 }`.  
+   • All animations capped at 250 ms, 60 fps‑safe, respect `prefers-reduced-motion`.
+
+====================  DELIVERY  ====================
+* Update / create files to satisfy above.
+* Include full code blocks only—no prose.
+* Ensure `npm test` and `npm run playwright test` return 0 locally.
+

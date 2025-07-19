@@ -1,0 +1,50 @@
+🎯  Sprint 03 — polish & consistency
+Role: senior engineer refining RoomSpot MVP.
+
+==========  NEW REQUIREMENTS  ==========
+
+1. 🔍  **Animated search hero**
+   • Hero stays 100 vh, no scroll.  
+   • Search input centered.  
+   • Prefill cycles through phrases with typing / back‑spacing effect  
+     (“Search your university” → “Search your locality” → “Search by ZIP” …).  
+   • Use framer‑motion + `react-typical` (or similar) for 60 fps text animation.
+
+2. 📚  **Real‑time school list**
+   • Autocomplete hits `https://api.data.gov/ed/collegescorecard/v1/schools?school.name=…&fields=id,school.name,school.city,school.state&per_page=20` (free, covers all 50 states).  
+   • Debounce 200 ms; reject non‑matching input.  
+   • If no hit, prompt for ZIP code instead (5‑digit regex).  
+   • Total autocomplete latency goal: < 5 ms after local cache load (pre‑warm via SWR).
+
+3. 🖼️  **Google‑style landing**
+   • Entire hero fits within viewport on every break‑point (375 × 667 → 1920 × 1080).  
+   • Body `overflow-hidden` until a result list renders.  
+   • Results dropdown mimics Google: absolute below input, max‑height 60 vh, scroll inside the dropdown only.
+
+4. 🧭  **Theme consistency audit**
+   • Re‑apply monochrome + Notion whitespace on **every** component modified in prior sprints.  
+   • Run visual regression tests (`@playwright/test` + `jest-image-snapshot`) against baseline screenshots stored in `tests/__screenshots__/`.
+
+5. 👤  **Guest explore vs gated actions**
+   • Search + result thumbnails are public.  
+   • Clicking a listing triggers modal “Log in to see details”.  
+   • Show teaser card inside modal: photo, rent, distance, “Unlock full details → Sign in”.  
+   • Filters panel appears but each control is `opacity-50 pointer-events-none` until auth; clicking any filter pops the same login modal.
+
+6. 📄  **Profile page (Notion‑clean + micro‑animations)**
+   • Route `/profile`.  
+   • Sections: Account, Preferences, Verification Status, Subscriptions.  
+   • Each section is an animated accordion; icons spin 15° on hover (`framer‑motion` spring, 200 ms).  
+   • Dark‑mode OFF; still black & white palette.
+
+==========  ACCEPTANCE CRITERIA  ==========
+
+✔  Lighthouse ≥ 95 perf / a11y / best‑practices on both mobile & desktop.  
+✔  Playwright “no‑scroll‑home” test passes on 360 × 800, 768 × 1024, 1440 × 900.  
+✔  Visual regression shows zero diff > 0.1 % outside intended changes.  
+✔  Jest unit tests cover autocomplete fallback, login‑gate modal, profile accordion state.  
+
+==========  DELIVERY  ==========
+
+• Output ONLY the changed or new files with full code blocks.  
+• Ensure `pnpm test && pnpm playwright test` return 0 locally.
